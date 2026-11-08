@@ -1,0 +1,136 @@
+/* The palette from the web app (src/app.css); keep the two in step. */
+:root {
+	--bg: #f7f6f3;
+	--surface: #ffffff;
+	--border: #e3e0da;
+	--text: #22201d;
+	--muted: #6a655e;
+	--accent: #0b5f73;
+	--accent-text: #ffffff;
+	--danger: #b3261e;
+	--fill: color-mix(in srgb, var(--text) 6%, transparent);
+	--fill-strong: color-mix(in srgb, var(--text) 12%, transparent);
+	--knob: var(--surface);
+	--radius: 0.875rem;
+
+	color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--bg: #111314;
+		--surface: #191c1e;
+		--border: #2a2e31;
+		--text: #ecebe8;
+		--muted: #a09c95;
+		--accent: #5bb8cc;
+		--accent-text: #0a1216;
+		--danger: #f2877d;
+		--knob: var(--text);
+	}
+}
+
+body {
+	margin: 0;
+	background: var(--bg);
+	color: var(--text);
+	font:
+		14px/1.5 system-ui,
+		sans-serif;
+}
+
+button {
+	min-height: 2.5rem;
+	padding: 0 1rem;
+	border: 0;
+	border-radius: 999px;
+	background: var(--fill);
+	color: inherit;
+	font: inherit;
+	font-weight: 550;
+	cursor: pointer;
+}
+
+button.primary {
+	background: var(--accent);
+	color: var(--accent-text);
+}
+
+button:disabled {
+	opacity: 0.6;
+	cursor: default;
+}
+
+select {
+	width: 100%;
+	min-height: 2.5rem;
+	padding: 0 0.75rem;
+	border: 1px solid var(--border);
+	border-radius: 0.625rem;
+	background: var(--surface);
+	color: inherit;
+	font: inherit;
+}
+
+/* Rows of settings or addresses on one card. */
+.list {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	background: var(--surface);
+	border: 1px solid var(--border);
+	border-radius: var(--radius);
+}
+
+.list > li {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
+	min-height: 3rem;
+	padding: 0.5rem 0.875rem;
+}
+
+.list > li + li {
+	border-top: 1px solid var(--border);
+}
+
+.row-text {
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+}
+
+.muted {
+	color: var(--muted);
+}
+
+.small {
+	font-size: 0.8125rem;
+}
+
+.error {
+	color: var(--danger);
+}
+
+a,
+button.link {
+	color: var(--accent);
+}
+
+button.link {
+	min-height: 0;
+	padding: 0;
+	background: none;
+	font-weight: 450;
+}
+
+/* Actions at the end of a row read as controls, like the buttons beside them. */
+.list a {
+	flex-shrink: 0;
+	text-decoration: none;
+}
+
+.list a:hover {
+	text-decoration: underline;
+}

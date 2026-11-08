@@ -1,0 +1,30 @@
+import { existsSync } from 'node:fs';
+import { defineConfig } from 'wxt';
+
+if (existsSync('.env')) process.loadEnvFile();
+
+// The delitesco site the extension talks to: http://localhost:5173 while developing.
+const appUrl = new URL(process.env.WXT_APP_URL ?? 'https://delitesco.net').origin;
+
+export default defineConfig({
+	modules: ['@wxt-dev/module-svelte', '@wxt-dev/auto-icons'],
+	autoIcons: { baseIconPath: 'assets/icon.svg' },
+	manifest: {
+		name: 'delitesco',
+		description: 'Fill in a private email alias wherever a site asks for your email.',
+		permissions: ['storage', 'activeTab'],
+		host_permissions: [`${appUrl}/*`],
+		commands: {
+			'fill-alias': {
+				suggested_key: { default: 'Alt+Shift+E' },
+				description: "Fill in the site's alias in the focused email field"
+			}
+		}
+	},
+	vite: () => ({
+		define: { 'import.meta.env.WXT_APP_URL': JSON.stringify(appUrl) },
+		// Chrome ignores module preloads on extension pages and warns about each one;
+		// the files are local anyway, so there is nothing to gain from preloading.
+		build: { modulePreload: false }
+	})
+});
