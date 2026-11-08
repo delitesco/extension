@@ -20,7 +20,7 @@ the site, where you press Allow. The site creates a key for the extension and ha
 extension's content script on that page. Only the hash of the key is stored on the server.
 Disconnecting from the extension, or from Account → Security on the site, revokes the key.
 
-The extension calls these endpoints with the key:
+The extension calls these endpoints, on the API host, with the key:
 
 - `GET /api/v1/aliases?site=github.com` returns the aliases made for a site.
 - `POST /api/v1/aliases` with `{ "site": "github.com", "domain"?, "mailboxIds"?, "randomOnly"? }`
@@ -41,8 +41,13 @@ npm run dev:firefox
 To load a build by hand: `npm run build`, then in Chrome open `chrome://extensions`, turn on
 Developer mode and choose "Load unpacked" with `.output/chrome-mv3`.
 
-`npm run zip` and `npm run zip:firefox` make the packages for the stores. Without `WXT_APP_URL`
-the extension talks to https://delitesco.net.
+`npm run zip` and `npm run zip:firefox` make the packages for the stores.
+
+Two addresses are baked into a build: the site (`WXT_APP_URL`, for the connect page and links into
+the account) and the API (`WXT_API_URL`, where API calls go). Without either, a build uses
+https://delitesco.net and https://alias-api.delitesco.net. With only `WXT_APP_URL` set, as in
+development, the API is expected on the same address. A production build that sets `WXT_APP_URL`
+must set `WXT_API_URL` too.
 
 ## Credits
 

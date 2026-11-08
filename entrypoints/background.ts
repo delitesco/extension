@@ -1,5 +1,5 @@
 import { browser, defineBackground } from '#imports';
-import { APP_ORIGIN } from '@/lib/config';
+import { API_ORIGIN, APP_ORIGIN } from '@/lib/config';
 import type { AccountInfo, Reply, Request, TabRequest } from '@/lib/messages';
 import { apiKey, defaultDomain, forwardTo, randomOnly } from '@/lib/storage';
 
@@ -16,7 +16,7 @@ async function api<T>(method: 'GET' | 'POST' | 'DELETE', path: string, body?: ob
 	const key = await apiKey.getValue();
 	if (!key) throw new Problem('Connect your delitesco account first: click the delitesco icon.');
 
-	const response = await fetch(`${APP_ORIGIN}/api/v1/${path}`, {
+	const response = await fetch(`${API_ORIGIN}/api/v1/${path}`, {
 		method,
 		headers: {
 			Authorization: `Bearer ${key}`,
@@ -25,7 +25,7 @@ async function api<T>(method: 'GET' | 'POST' | 'DELETE', path: string, body?: ob
 		body: body && JSON.stringify(body)
 	}).catch((cause) => {
 		// The browser hides the reason from scripts; its own console usually says more.
-		console.error(`Request to ${APP_ORIGIN} failed`, cause);
+		console.error(`Request to ${API_ORIGIN} failed`, cause);
 		throw new Problem("Can't reach delitesco. Check your connection.");
 	});
 	const payload = response.status === 204 ? null : await response.json();
