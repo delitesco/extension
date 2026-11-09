@@ -98,7 +98,9 @@ export function createFieldButton(site: string) {
 		say(reply.value.isNew ? 'New alias filled in' : 'Filled in your alias for this site');
 	}
 
-	button.addEventListener('click', fillAlias);
+	// The page's scripts can't reach into the closed shadow root, but only a real click or key
+	// press should make an alias in any case.
+	button.addEventListener('click', (event) => event.isTrusted && fillAlias());
 
 	function show(input: HTMLInputElement) {
 		field = input;
