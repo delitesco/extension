@@ -1,6 +1,6 @@
 import { storage } from '#imports';
 
-/** The key from the connect page. The background script uses it; others only check it's set. */
+/** The key from the connect page. Only the background script and the extension's own pages read it. */
 export const apiKey = storage.defineItem<string>('local:apiKey');
 
 // Settings sync between the user's browsers; the key stays on this one.

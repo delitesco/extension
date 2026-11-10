@@ -1,7 +1,10 @@
 import { browser, defineBackground } from '#imports';
 import { API_ORIGIN, APP_ORIGIN } from '@/lib/config';
 import type { AccountInfo, Reply, Request, TabRequest } from '@/lib/messages';
+import { siteOf } from '@/lib/site';
 import { apiKey, defaultDomain, forwardTo, randomOnly } from '@/lib/storage';
+
+const EXTENSION_ORIGIN = new URL(browser.runtime.getURL('/options.html')).origin;
 
 class Problem extends Error {
 	constructor(
@@ -60,31 +63,54 @@ async function createAlias(site: string): Promise<string> {
 }
 
 async function handle(request: Request, senderUrl: string | undefined): Promise<unknown> {
+	const sender = senderUrl ? new URL(senderUrl) : null;
+	// The popup and the settings page. Every other sender is a content script, which runs in
+	// its page's process: a page that breaks out of the browser's sandbox could send anything
+	// from there, so it only gets what belongs to its own site.
+	const ownPage = sender?.origin === EXTENSION_ORIGIN;
+	const needsOwnPage = () => {
+		if (!ownPage) throw new Problem('Only the extension itself can do this.');
+	};
+	const needsOwnSite = (site: string) => {
+		if (!ownPage && (!sender || siteOf(sender) !== site)) {
+			throw new Problem('An alias can only be made for the site you are on.');
+		}
+	};
+
 	switch (request.type) {
 		case 'connect':
 			// Only the delitesco connect page may hand over a key, never another site.
-			if (!senderUrl || new URL(senderUrl).origin !== APP_ORIGIN) {
+			if (sender?.origin !== APP_ORIGIN)
 				throw new Problem('Keys are only accepted from delitesco.');
-			}
 			await apiKey.setValue(request.key);
 			return null;
+		case 'connected':
+			return (await apiKey.getValue()) !== null;
 		case 'disconnect':
+			needsOwnPage();
 			// Revoke the key on the server first, so a copy of it can't be used afterwards.
 			await api('DELETE', 'key');
 			await apiKey.removeValue();
 			return null;
 		case 'account':
+			needsOwnPage();
 			return api<AccountInfo>('GET', 'account');
 		case 'siteAliases': {
+			needsOwnSite(request.site);
 			const query = new URLSearchParams({ site: request.site });
 			return (await api<{ addresses: string[] }>('GET', `aliases?${query}`)).addresses;
 		}
 		case 'createAlias':
+			needsOwnSite(request.site);
 			return createAlias(request.site);
 	}
 }
 
 export default defineBackground(() => {
+	// Content scripts run in web pages' processes and need only the settings; the key stays out of
+	// their reach. Firefox has no such setting, which is why they also never ask for it.
+	void browser.storage.local.setAccessLevel?.({ accessLevel: 'TRUSTED_CONTEXTS' });
+
 	browser.commands.onCommand.addListener(async (command, tab) => {
 		// The browser's own pages have no content script and nothing to fill.
 		if (command !== 'fill-alias' || tab?.id === undefined || !tab.url?.startsWith('http')) return;

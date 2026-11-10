@@ -4,7 +4,7 @@ import { createFieldButton } from '@/lib/field-button';
 import { fill, isEmailField } from '@/lib/fill';
 import { send, type TabRequest } from '@/lib/messages';
 import { siteOf } from '@/lib/site';
-import { apiKey, fieldButton, hiddenSites } from '@/lib/storage';
+import { fieldButton, hiddenSites } from '@/lib/storage';
 
 // The other half is the delitesco page at /extension/connect.
 function answerConnectPage() {
@@ -31,20 +31,19 @@ async function live<T>(item: WxtStorageItem<T, Record<string, unknown>>) {
 async function watchEmailFields() {
 	const site = siteOf(location);
 	const button = createFieldButton(site);
-	const [key, enabled, hidden] = await Promise.all([
-		live(apiKey),
-		live(fieldButton),
-		live(hiddenSites)
-	]);
+	const [enabled, hidden] = await Promise.all([live(fieldButton), live(hiddenSites)]);
 	let lastField: HTMLInputElement | null = null;
 
 	addEventListener(
 		'focusin',
-		(event) => {
-			if (!isEmailField(event.target)) return;
-			lastField = event.target;
+		async (event) => {
+			const field = event.target;
+			if (!isEmailField(field)) return;
+			lastField = field;
+			if (!enabled.value || hidden.value.includes(site)) return;
 			// Before the extension is connected the button could only show an error.
-			if (key.value && enabled.value && !hidden.value.includes(site)) button.show(event.target);
+			const connected = await send({ type: 'connected' });
+			if (connected.ok && connected.value && field === lastField) button.show(field);
 		},
 		true
 	);

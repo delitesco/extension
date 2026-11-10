@@ -21,9 +21,14 @@ export interface AccountInfo {
 	mailboxes: Mailbox[];
 }
 
-/** Messages the content script, popup and settings page send to the background script. */
+/**
+ * Messages the content script, popup and settings page send to the background script. A content
+ * script may only connect, ask whether the extension is connected, and make or look up aliases
+ * for the site it runs on.
+ */
 export type Request =
 	| { type: 'connect'; key: string }
+	| { type: 'connected' }
 	| { type: 'disconnect' }
 	| { type: 'account' }
 	| { type: 'siteAliases'; site: string }
@@ -32,6 +37,7 @@ export type Request =
 
 interface Replies {
 	connect: null;
+	connected: boolean;
 	disconnect: null;
 	account: AccountInfo;
 	siteAliases: string[];
