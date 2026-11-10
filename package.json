@@ -3,6 +3,18 @@
 	"description": "Fill in a private email alias wherever a site asks for your email.",
 	"version": "0.1.0",
 	"license": "AGPL-3.0-only",
+	"author": {
+		"name": "delitesco",
+		"email": "github@delitesco.net"
+	},
+	"homepage": "https://delitesco.net/extension",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/delitesco/extension.git"
+	},
+	"bugs": {
+		"url": "https://github.com/delitesco/extension/issues"
+	},
 	"private": true,
 	"type": "module",
 	"scripts": {
@@ -13,14 +25,22 @@
 		"zip": "wxt zip",
 		"zip:firefox": "wxt zip -b firefox",
 		"check": "wxt prepare && svelte-check --tsconfig ./tsconfig.json",
-		"postinstall": "wxt prepare"
+		"postinstall": "wxt prepare",
+		"format": "prettier --write .",
+		"lint": "prettier --check ."
 	},
 	"devDependencies": {
+		"@types/node": "^22.20.5",
 		"@wxt-dev/auto-icons": "^1.1.2",
 		"@wxt-dev/module-svelte": "^2.0.5",
+		"prettier": "^3.9.10",
+		"prettier-plugin-svelte": "^3.5.2",
 		"svelte": "^5.57.3",
 		"svelte-check": "^4.7.8",
 		"typescript": "^6.0.3",
 		"wxt": "^0.21.5"
+	},
+	"engines": {
+		"node": ">=22"
 	}
 }
