@@ -33,7 +33,7 @@
 		"@types/node": "^22.20.5",
 		"@wxt-dev/auto-icons": "^1.1.2",
 		"@wxt-dev/module-svelte": "^2.0.5",
-		"prettier": "^3.9.10",
+		"prettier": "^3.10.1",
 		"prettier-plugin-svelte": "^3.5.2",
 		"svelte": "^5.57.3",
 		"svelte-check": "^4.7.8",
